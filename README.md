@@ -6,6 +6,7 @@ this workflow will check the availability of the api where we send get requests,
 # Getting Started
 . install airflow on your GCP cluster
   run airflow initdb, airflow scheduler, airflow webserver
+  
 . create 3 conn_id on airflow web ui
   conn id : kawalcorona_api, conn Type: HTTP, Host: http://api.kawalcorona.com/
   conn id: data_path, conn Type: File(path), Extra: {"path": "~/airflow/dags/files"}
