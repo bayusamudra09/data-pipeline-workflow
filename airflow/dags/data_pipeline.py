@@ -87,7 +87,7 @@ with DAG(dag_id="data_pipeline", schedule_interval="@daily", default_args= defau
         task_id="creating_table",
         hive_cli_conn_id="hive_conn",
         hql="""
-            CREATE EXTERNAL TABLE IF NOT EXISTS covid_dataset(
+            CREATE EXTERNAL TABLE IF NOT EXISTS covid_update_dataset(
         		tanggal DATE,
         		provinsi STRING,
         		positif INT,
