@@ -14,14 +14,15 @@ spark = SparkSession \
     .enableHiveSupport() \
     .getOrCreate()
 
+
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days = 1)
 
+#use your gcp internal_ip and hdfs_port as default 8020
+df_today = spark.read.json(f'hdfs://internal_ip:hdfs_port~/covid/covid_{str(today)}.json')
 
-df_today = spark.read.json(f'hdfs://10.184.0.16:8080/user/bayusamudra/covid/covid_{str(today)}.json')
-
-if exists(f'hdfs://10.184.0.16:8080/user/bayusamudra/covid/covid_{str(yesterday)}.json'):
-    df_yesterday = spark.read.json(f'hdfs://10.184.0.16:8080/user/bayusamudra/covid/covid_{str(yesterday)}.json')
+if exists(f'hdfs://internal_ip:hdfs_port~/covid/covid_{str(yesterday)}.json'):
+    df_yesterday = spark.read.json(f'hdfs://internal_ip:hdfs_port~/covid/covid_{str(yesterday)}.json')
     update_covid = df_today.select(col('tanggal'),col("provinsi"),col("positif"),col("sembuh"),col("meninggal"))\
     .join(df_yesterday.select(col("positif").alias("positif_2"),col("sembuh").alias("sembuh_2"),col("meninggal").alias("meninggal_2"),col("provinsi")), "provinsi")\
     .withColumn("pertambahan_positif", (col("positif")-col("positif_2")))\
@@ -33,7 +34,5 @@ else:
 	update_covid = df_today.withColumn("pertambahan_positif", col("positif")).withColumn("pertambahan_sembuh", col("sembuh")).withColumn("pertambahan_meninggal", col("meninggal"))
 
 
-update_covid = update_covid.select("tanggal","provinsi", "positif", "sembuh", "meninggal", "pertambahan_positif","pertambahan_sembuh", "pertambahan_meninggal")\
-			.dropDuplicates() \
-			.fillna(0)
+update_covid = update_covid.select("tanggal","provinsi", "positif", "sembuh", "meninggal", "pertambahan_positif","pertambahan_sembuh", "pertambahan_meninggal")
 update_covid.write.mode("append").insertInto("covid_update_dataset")
