@@ -21,7 +21,7 @@ yesterday = today - datetime.timedelta(days = 1)
 #use your gcp internal_ip and hdfs_port as default 8020
 df_today = spark.read.json(f'hdfs://internal_ip:hdfs_port~/covid/covid_{str(today)}.json')
 
-if exists(f'hdfs://internal_ip:hdfs_port~/covid/covid_{str(yesterday)}.json'):
+if exists(f'~/airflow/dags/files/covid_{str(yesterday)}.json'):
     df_yesterday = spark.read.json(f'hdfs://internal_ip:hdfs_port~/covid/covid_{str(yesterday)}.json')
     update_covid = df_today.select(col('tanggal'),col("provinsi"),col("positif"),col("sembuh"),col("meninggal"))\
     .join(df_yesterday.select(col("positif").alias("positif_2"),col("sembuh").alias("sembuh_2"),col("meninggal").alias("meninggal_2"),col("provinsi")), "provinsi")\
